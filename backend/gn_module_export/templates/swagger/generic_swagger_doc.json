@@ -6,7 +6,7 @@
     "description": "{{export_description}}",
     "license": {
       "name": "{{licence_nom}}",
-      "url": "{{licence_description}}",
+      "url": "{{licence_description}}"
     },
     "contact": {
       "name": "API Support",
@@ -20,7 +20,7 @@
   },
   "host": "{{host}}",
   "basePath": "{{base_path}}",
-  "schemes": {{schemes}},
+  "schemes": {{schemes|tojson}},
   "produces": [
     "application/json"
   ],
