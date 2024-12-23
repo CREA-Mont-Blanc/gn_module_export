@@ -1,16 +1,21 @@
-
 # CHANGELOG
 
+1.7.3 (unreleased)
+------------------
+
+**🐛 Corrections**
+
+- Correction du JSON de configuration du Swagger permettant de documenter automatiquement l'API des exports (#222, par @jbrieuclp)
+
 1.7.2 (2024-10-04)
------------------
+------------------
 
 **🐛 Corrections**
 
 - La fonction `get_one_export_api` est corrigée et retourne un GeoJSON si une géométrie est présente (#214)
 
-
 1.7.1 (2024-08-23)
------------------
+------------------
 
 **🐛 Corrections**
 
