@@ -1,5 +1,5 @@
 """
-    Module de gestion des exports
+Module de gestion des exports
 """
 
 from geonature.utils.env import DB
@@ -69,6 +69,13 @@ def generate_swagger_spec(id_export):
             "name": "orderby",
             "type": "varchar",
             "description": "Nom d'un champ de la vue qui sera utilisé comme variable de tri. Une mention au sens du tri peut être ajoutée en utilisant la syntaxe suivante : nom_col[:ASC|DESC]",
+        },
+        {
+            "in": "query",
+            "name": "geometry",
+            "type": "array[string]",
+            "description": "Permet de retourner les entrées dont la géométrie intersecte avec celle spécifiée dans le paramètre. La géométrie doit être au format WKT (Well-Known Text)."
+            + " et les coordonnées de la zone doivent correspondre au SRID de la vue. \n Exemple : POLYGON ((4.833984 41.541478, 14.633789 41.541478, 14.633789 46.437857, 4.833984 46.437857, 4.833984 41.541478))",
         },
     ]
 

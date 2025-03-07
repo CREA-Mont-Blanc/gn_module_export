@@ -1,5 +1,5 @@
 """
-    Définition des routes du module export
+Définition des routes du module export
 """
 
 import logging
@@ -235,6 +235,9 @@ def get_one_export_api(id_export):
         filter_n_lo_nom_col=val: Si nom_col fait partie des colonnes
             de la vue et que la colonne est de type numérique
             alors filtre nom_col <= val
+        geometry=val: Si nom_col fait partie des colonnes
+            de la vue et que la colonne est de type geometry
+            alors ST_Intersects(nom_col, ST_GeomFromText(val))
     ORDONNANCEMENT :
         orderby: char
             Nom du champ sur lequel baser l'ordonnancement
