@@ -131,7 +131,7 @@ def export_data_file(export_id, file_name, export_url, format, id_role, filters)
             export=export,
             file_format=format,
             filename=file_name,
-            generic_query_geo=export.get_view_query(limit=-1, offset=0, filters=None),
+            generic_query_geo=export.get_view_query(limit=None, offset=0, filters=None),
         )
     except Exception as exp:
         notify_export_file_generated(

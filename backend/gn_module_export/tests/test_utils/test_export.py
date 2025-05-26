@@ -27,8 +27,8 @@ class TestUtilsExport:
                 reader = csv.DictReader(csvfile, dialect=dialect)
                 ids = {int(row["id_synthese"]) for row in reader}
         ids_synthese = {
-            synthese["id_synthese"]
-            for synthese in export_synthese_sinp_query.return_query()["items"]
+            synthese["properties"]["id_synthese"]
+            for synthese in export_synthese_sinp_query.return_query()["items"]["features"]
         }
         assert ids_synthese == ids
 
