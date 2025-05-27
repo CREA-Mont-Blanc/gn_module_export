@@ -10,24 +10,38 @@
           <hr />
         </div>
         <!-- Liste des exports disponibles au téléchargement -->
-        <div *ngIf="exports">
+        <div class="flex-fill search">
+          <input
+            id="search"
+            [formControl]="search"
+            type="text"
+            class="form-control"
+            placeholder="{{ 'Actions.Search' | translate }}"
+            aria-label="Search"
+            aria-describedby="basic-addon1"
+            data-qa="import-list-toolbar-search"
+          />
+        </div>
+        <div *ngIf="pagination.total > 0">
           <div
             class="card export-card mb-3"
             *ngFor="let export of exports; let i = index"
           >
-            <div class="card-body">
-              <h5 class="card-title">
-                <span
-                  class="badge badge-info"
-                  title="ID de l'export"
-                  data-toggle="tooltip"
-                >
-                  {{ export.id }}
-                </span>
-                {{ export.label }}
-              </h5>
-              <p class="card-text">{{ export.desc }}</p>
-              <div class="d-flex justify-content-end">
+            <div class="card-body export-card">
+              <div class="flex-grow-1">
+                <h5 class="card-title">
+                  <span
+                    class="badge badge-info"
+                    title="ID de l'export"
+                    data-toggle="tooltip"
+                  >
+                    {{ export.id }}
+                  </span>
+                  {{ export.label }}
+                </h5>
+                <p class="card-text">{{ export.desc }}</p>
+              </div>
+              <div class="align-content-end">
                 <button
                   id="{{ export.id }}"
                   type="submit"
@@ -62,9 +76,16 @@
             </div>
           </div>
         </div>
-        <div *ngIf="!exports">
+        <div *ngIf="pagination.total == 0">
           <div class="alert alert-warning text-center">Aucun export n'est disponible</div>
         </div>
+        <mat-paginator
+          (page)="handlePageChange($event)"
+          [pageSize]="pagination.per_page"
+          [pageIndex]="pagination.page - 1"
+          [length]="pagination.total"
+          [pageSizeOptions]="[5, 10, 20]"
+        ></mat-paginator>
       </div>
     </div>
   </div>

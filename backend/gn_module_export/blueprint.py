@@ -36,6 +36,7 @@ from gn_module_export.schemas import ExportSchema
 from .utils_export import ExportRequest
 from sqlalchemy.orm.exc import NoResultFound
 from utils_flask_sqla.response import json_resp, to_json_resp
+from utils_flask_sqla.db import ordered
 from werkzeug.exceptions import Forbidden
 
 LOGGER = current_app.logger
@@ -191,8 +192,24 @@ def get_exports(scope):
     Fonction qui renvoie la liste des exports
     accessibles pour un role donné
     """
-    exports = Export.query.filter_by_scope(scope).all()
-    return ExportSchema(many=True, only=["licence", "cor_roles_exports"]).dump(exports)
+
+    search_string = request.args.get("search", None, type=str)
+    page = request.args.get("page", None, type=int)
+    per_page = request.args.get("per_page", None, type=int)
+
+    query = Export.query.filter_by_scope(scope)
+    if search_string:
+        search_string = "%".join(search_string.split(" "))
+        query = query.where(Export.label.ilike(f"%{search_string}%"))
+
+    schema = ExportSchema(many=True, only=["licence", "cor_roles_exports"])
+    query = ordered(query, Export, order_by=Export.label)
+    if per_page and page:
+        g.pagination_schema = schema
+        return DB.paginate(query, page=page, per_page=per_page)
+
+    exports = query.all()
+    return schema.dump(exports)
 
 
 @blueprint.route("/api/<int:id_export>", methods=["GET"])

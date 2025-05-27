@@ -16,3 +16,19 @@ form.ng-invalid {
   font-size: medium;
   padding-top: 5px;
 }
+
+.export-card {
+  display: flex;
+}
+
+.search {
+  margin-bottom: 10px;
+  input {
+  max-height: 36px;
+
+  &::placeholder {
+    color: #999;
+    /* default theme ng-placehodler color */
+  }
+}
+}
