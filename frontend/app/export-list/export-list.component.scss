@@ -2,6 +2,10 @@
   height: 94vh;
 }
 
+#export-container{
+  background-color: #efefef;
+}
+
 form.ng-invalid {
   border-left: none !important;
 }
@@ -17,18 +21,49 @@ form.ng-invalid {
   padding-top: 5px;
 }
 
-.export-card {
-  display: flex;
-}
-
 .search {
-  margin-bottom: 10px;
-  input {
-  max-height: 36px;
-
-  &::placeholder {
-    color: #999;
-    /* default theme ng-placehodler color */
+  margin-bottom: 1.5em;
+  margin-top: 1.5em;
+  display: flex;
+  justify-content: center;
+  .input-group {
+    max-height: 36px;
+    width: 66%;
+    &::placeholder {
+      color: #999;
+      /* default theme ng-placehodler color */
+    }
   }
 }
+
+.export-content{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+}
+.description{
+  width: 66%;
+}
+
+.button-set{
+// flex-grow: 0;
+display: flex;
+justify-content: flex-end;
+}
+
+.button-set > .btn{
+  margin-right: 0.5em;
+  align-self: flex-end;
+
+}
+#list-export{
+  overflow: scroll;
+  margin-bottom: 1em;
+  overflow-x: hidden;
+  max-height: 100%;
+}
+
+#export-container{
+  height: 90vh;
 }
