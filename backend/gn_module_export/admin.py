@@ -1,5 +1,8 @@
-from flask import current_app, flash
+from flask import current_app, flash, url_for
+from gn_module_export.utils_export import ExportRequest
 from markupsafe import Markup
+from pathlib import Path
+from datetime import datetime
 from flask_admin.babel import gettext
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.helpers import is_form_submitted
@@ -7,14 +10,11 @@ from geonature.core.admin.admin import CruvedProtectedMixin
 from geonature.core.admin.admin import admin as flask_admin
 from geonature.core.users.models import CorRole
 from geonature.utils.env import DB
+from geonature.utils.config import config
+from geonature.utils.filemanager import removeDisallowedFilenameChars
 from gn_module_export.models import Export, ExportSchedules, Licences
 from psycopg2.errors import ForeignKeyViolation
-from pypnusershub.db.models import (
-    Application,
-    AppRole,
-    User,
-    UserApplicationRight,
-)
+from pypnusershub.db.models import Application, AppRole, User, UserApplicationRight
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from utils_flask_sqla_geo.generic import GenericQueryGeo
@@ -120,7 +120,9 @@ class ExportView(CruvedProtectedMixin, ModelView):
     ]
     column_searchable_list = ("label",)
     column_formatters_detail = {"cor_roles_exports": _token_formatter}
-    column_formatters = {"allowed_roles": list_label_allowed_role_formatter}
+    column_formatters = {
+        "allowed_roles": list_label_allowed_role_formatter,
+    }
 
     column_labels = dict(
         id="Identifiant",
@@ -227,15 +229,73 @@ class ExportSchedulesView(CruvedProtectedMixin, ModelView):
     module_code = "EXPORTS"
     object_code = None
 
+    column_list = ["export", "frequency", "format", "last_export", "generate"]
     column_descriptions = dict(
         export="Nom de l'export à planifier",
         frequency="Fréquence de la génération de l'export (en jours)",
         format="Format de l'export à générer",
     )
+    column_labels = {
+        "generate": "",
+        "last_export": "Date du dernier export",
+        "frequency": "Fréquence",
+    }
+
+    def _last_export_formatter(view, context, model, name):
+        """
+        Display the date when the last export was made.
+        """
+        file_path = model.filepath()
+        if file_path.exists() and not model.in_process:
+            return datetime.fromtimestamp(file_path.stat().st_mtime).strftime("%d/%m/%Y %H:%M")
+
+    def _url_export_formatter(view, context, model, name):
+        """
+        Return a link button that allows the user to download the latest export file
+        """
+        file_path = model.filepath()
+        if file_path.exists() and not model.in_process:
+            size_file = file_path.stat().st_size / 1024 / 1024  # in MB
+            return f"<a href='{model.file_url_access()}' target='_blank' class='btn m-1 btn-primary'><i class='fa fa-download'></i> {size_file:.1f} MB</a>"
+        return ""
+
+    def generate_button_formater(view, _context, model, _name):
+        """
+        Return the `generate` column content :
+         * If an existing export file exists, display an button to download it
+         * If an export to geojson, or gpkg file is invalid (no geom column or SRID given in the Export), shows
+         an error message
+         * If an export is being generated, the generate button is disabled
+        """
+        html_output = ""
+        print("aaaa", not model.is_export_available())
+        if not model.is_export_available():
+            html_output = "<span style='color:red'>SRID ou Champs géométrique manquant : impossible de générer l'export dans ce format.</span>"
+        else:
+            link_to_generate = url_for(
+                "exports.forceScheduleExport",
+                id_export=model.id_export,
+                export_format=model.format,
+            )
+            next_ = url_for("exportschedules.index_view")
+            link_to_generate = "" if model.in_process else f"{link_to_generate}?next={next_}"
+            css_class = "btn-light disabled" if model.in_process else "btn-primary"
+            btn_content = "Génération en cours..." if model.in_process else "Générer"
+            html_output += (
+                f"<a href='{link_to_generate}' class='btn m-1 {css_class}'>{btn_content}</a>"
+            )
+
+        html_output += ExportSchedulesView._url_export_formatter(view, _context, model, _name)
+
+        return Markup(html_output)
 
     form_args = {
         "export": {"validators": [validators.DataRequired()]},
         "frequency": {"validators": [validators.NumberRange(1, 365)]},
+    }
+    column_formatters = {
+        "generate": generate_button_formater,
+        "last_export": _last_export_formatter,
     }
 
     if "EXPORTS" in current_app.config:
