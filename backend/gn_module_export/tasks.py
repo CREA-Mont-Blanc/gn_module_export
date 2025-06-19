@@ -58,7 +58,9 @@ def generate_scheduled_exports(self):
 
 
 @celery_app.task(bind=True, throws=ExportGenerationNotNeeded)
-def generate_export(self, export_id, file_name, export_url, format, id_role, filters, schedule_id):
+def generate_export(
+    self, export_id, file_name, export_url, format, id_role, filters, schedule_id=None
+):
     logger.info(f"Generate export {export_id} {schedule_id}...")
     export = db.session.get(Export, export_id)
     if export is None:
