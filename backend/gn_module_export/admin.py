@@ -268,7 +268,6 @@ class ExportSchedulesView(CruvedProtectedMixin, ModelView):
          * If an export is being generated, the generate button is disabled
         """
         html_output = ""
-        print("aaaa", not model.is_export_available())
         if not model.is_export_available():
             html_output = "<span style='color:red'>SRID ou Champs géométrique manquant : impossible de générer l'export dans ce format.</span>"
         else:
@@ -297,6 +296,7 @@ class ExportSchedulesView(CruvedProtectedMixin, ModelView):
         "generate": generate_button_formater,
         "last_export": _last_export_formatter,
     }
+    form_excluded_columns = ["in_process"]
 
     if "EXPORTS" in current_app.config:
         format_list = [(k, k) for k in current_app.config["EXPORTS"]["export_format_map"].keys()]
