@@ -203,7 +203,7 @@ class ExportSchedules(DB.Model):
         )
 
     def file_url_access(self) -> Path:
-        return Path(self.__export_request_instance.get_export_url())
+        return self.__export_request_instance.get_export_url()
 
     def filepath(self) -> Path:
         return Path(self.__export_request_instance.get_full_path_file_name())
