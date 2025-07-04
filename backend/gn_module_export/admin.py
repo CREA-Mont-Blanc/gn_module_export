@@ -15,7 +15,7 @@ from geonature.utils.filemanager import removeDisallowedFilenameChars
 from gn_module_export.models import Export, ExportSchedules, Licences
 from psycopg2.errors import ForeignKeyViolation
 from pypnusershub.db.models import Application, AppRole, User, UserApplicationRight
-from sqlalchemy import or_
+from sqlalchemy import or_, delete
 from sqlalchemy.exc import IntegrityError
 from utils_flask_sqla_geo.generic import GenericQueryGeo
 
@@ -304,6 +304,24 @@ class ExportSchedulesView(CruvedProtectedMixin, ModelView):
 
     def __init__(self, session, **kwargs):
         super(ExportSchedulesView, self).__init__(ExportSchedules, session, **kwargs)
+
+    def delete_model(self, model):
+        """
+        Delete model.
+        :param model:
+            Model to delete
+        """
+        print(model)
+        query = delete(ExportSchedules).where(
+            ExportSchedules.id_export_schedule == model.id_export_schedule
+        )
+        try:
+            self.session.execute(query)
+            self.session.commit()
+        except:
+            self.session.rollback()
+            return False
+        return True
 
 
 flask_admin.add_view(ExportView(DB.session, name="Exports", category="Export"))
